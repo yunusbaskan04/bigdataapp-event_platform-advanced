@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: consumer-service
+
+  kafka:
+    bootstrap-servers: localhost:19092
+
+server:
+  port: 8081

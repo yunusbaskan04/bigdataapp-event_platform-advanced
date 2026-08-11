@@ -27,10 +27,37 @@ event_platform/
 - [x] Sprint 01 - Repository Setup
 - [x] Sprint 02 - Docker Compose & Kafka Bootstrap
 - [x] Sprint 03 - Spring Boot Producer
-- [ ] Sprint 04 - Spring Boot Consumer
+- [x] Sprint 04 - Spring Boot Consumer
 - [ ] Sprint 05 - PostgreSQL
 - [ ] Sprint 06 - Kafka Connect
 - [ ] Sprint 07 - Debezium CDC
 - [ ] Sprint 08 - Kafka Streams
 - [ ] Sprint 09 - Monitoring
 - [ ] Sprint 10 - Production Improvements
+
+## Current Architecture
+
+
+Client
+│
+HTTP
+│
+▼
+Producer Service
+│
+KafkaTemplate
+│
+▼
+Kafka (orders)
+│
+@KafkaListener
+│
+▼
+Consumer Service
+
+
+Current Status
+
+- Producer publishes events to Kafka.
+- Consumer subscribes to the `orders` topic.
+- Event flow verified successfully.
