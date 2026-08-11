@@ -37,7 +37,6 @@ event_platform/
 
 ## Current Architecture
 
-
 Client
 │
 HTTP
@@ -48,16 +47,29 @@ Producer Service
 KafkaTemplate
 │
 ▼
-Kafka (orders)
+Kafka Topic (orders)
 │
 @KafkaListener
 │
 ▼
 Consumer Service
+│
+ConsumerRecord
+│
+▼
+Business Logic
+│
+Manual Commit
+│
+▼
+Offset Commit
 
 
-Current Status
+## Current Features
 
-- Producer publishes events to Kafka.
-- Consumer subscribes to the `orders` topic.
-- Event flow verified successfully.
+- Produce events using Spring Kafka
+- Consume events with KafkaListener
+- Consumer Groups
+- ConsumerRecord metadata
+- Manual Offset Commit
+- Retry on failure

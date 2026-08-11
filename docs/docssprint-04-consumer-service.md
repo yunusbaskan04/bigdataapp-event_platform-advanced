@@ -85,15 +85,125 @@ Useful fields:
 
 ---
 
+### Offset
+
+Every partition maintains its own offset sequence.
+
+Example:
+
+Partition 0
+
+Offset 0
+Offset 1
+Offset 2
+Offset 3
+
+Offset identifies the exact position of a record inside its partition.
+
+---
+
+### Auto Commit
+
+Default configuration:
+
+enable-auto-commit=true
+
+Kafka periodically commits offsets automatically.
+
+Advantages:
+
+- Easy configuration
+- Minimal code
+
+Disadvantages:
+
+- Possible message loss if the application crashes after the offset is committed but before business logic finishes.
+
+---
+
+### Manual Commit
+
+Configuration:
+
+enable-auto-commit=false
+
+listener:
+  ack-mode: manual_immediate
+
+Consumer explicitly decides when a message has been processed successfully.
+
+Example:
+
+acknowledgment.acknowledge();
+
+Advantages:
+
+- No message loss
+- Better control
+- Preferred for critical systems
+
+Possible downside:
+
+- Duplicate processing may occur if the application crashes before commit.
+
+---
+
+### Retry Mechanism
+
+When an exception occurs before offset commit:
+
+Business Logic
+        ↓
+Exception
+        ↓
+Offset NOT committed
+        ↓
+Spring Retry
+        ↓
+Kafka reads the same record again
+
+Observed log:
+
+Seeking to offset 4
+Record in retry and not yet recovered
+
+This demonstrates Spring Kafka's retry behavior.
+
+---
+
+## Delivery Semantics
+
+We connected today's implementation with Kafka delivery guarantees.
+
+| Strategy | Result |
+|----------|--------|
+| At Most Once | Possible message loss |
+| At Least Once | Possible duplicate processing |
+| Exactly Once | No loss and no duplicates (under specific conditions) |
+
+For an event-driven e-commerce system, **At Least Once** is generally preferred because duplicate messages are easier to handle than lost orders.
+
+---
+
 ## Test Result
 
-Producer successfully published messages.
+PSuccessfully verified:
 
-Consumer successfully received and processed them.
+- Producer → Kafka → Consumer flow
+- ConsumerRecord metadata
+- Manual commit configuration
+- Retry after exception
+- Offset behavior
 
+---
 
-Received : First Order
+## Lessons Learned
 
+- Kafka stores metadata together with every message.
+- Offset belongs to a partition, not the entire topic.
+- Commit timing determines delivery guarantees.
+- Manual commit provides more reliability.
+- Spring Kafka retries failed records automatically before giving up.
 
 ---
 

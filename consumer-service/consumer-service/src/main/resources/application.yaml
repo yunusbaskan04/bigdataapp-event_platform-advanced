@@ -5,5 +5,12 @@ spring:
   kafka:
     bootstrap-servers: localhost:19092
 
+    consumer:
+      group-id: order-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+    listener:
+      ack-mode: manual_immediate
 server:
   port: 8081
