@@ -28,7 +28,7 @@ event_platform/
 - [x] Sprint 02 - Docker Compose & Kafka Bootstrap
 - [x] Sprint 03 - Spring Boot Producer
 - [x] Sprint 04 - Spring Boot Consumer
-- [ ] Sprint 05 - PostgreSQL
+- [x] Sprint 05 - PostgreSQL
 - [ ] Sprint 06 - Kafka Connect
 - [ ] Sprint 07 - Debezium CDC
 - [ ] Sprint 08 - Kafka Streams
@@ -52,18 +52,19 @@ Kafka Topic (orders)
 @KafkaListener
 │
 ▼
-Consumer Service
-│
 ConsumerRecord
 │
 ▼
 Business Logic
 │
-Manual Commit
+▼
+PostgreSQL
 │
 ▼
-Offset Commit
+Manual Offset Commit
 
+
+## Current Features
 
 ## Current Features
 
@@ -71,5 +72,8 @@ Offset Commit
 - Consume events with KafkaListener
 - Consumer Groups
 - ConsumerRecord metadata
+- JSON deserialization using Jackson
+- Persist events into PostgreSQL
 - Manual Offset Commit
 - Retry on failure
+- At-Least-Once processing

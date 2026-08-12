@@ -12,5 +12,15 @@ spring:
 
     listener:
       ack-mode: manual_immediate
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/event_platform
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 server:
   port: 8081
