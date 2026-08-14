@@ -29,11 +29,13 @@ event_platform/
 - [x] Sprint 03 - Spring Boot Producer
 - [x] Sprint 04 - Spring Boot Consumer
 - [x] Sprint 05 - PostgreSQL
-- [ ] Sprint 06 - Kafka Connect
-- [ ] Sprint 07 - Debezium CDC
-- [ ] Sprint 08 - Kafka Streams
-- [ ] Sprint 09 - Monitoring
-- [ ] Sprint 10 - Production Improvements
+- [x] Sprint 06 - Reliable Consumer Processing
+- [ ] Sprint 07 - Idempotent Consumer
+- [ ] Sprint 08 - Kafka Connect
+- [ ] Sprint 09 - Debezium CDC
+- [ ] Sprint 10 - Kafka Streams
+- [ ] Sprint 11 - Monitoring
+- [ ] Sprint 12 - Production Improvements
 
 ## Current Architecture
 
@@ -49,19 +51,30 @@ KafkaTemplate
 ▼
 Kafka Topic (orders)
 │
-@KafkaListener
-│
 ▼
-ConsumerRecord
+Consumer Service
 │
 ▼
 Business Logic
 │
-▼
-PostgreSQL
+├───────────────► Success
+│                    │
+│                    ▼
+│             PostgreSQL
+│                    │
+│                    ▼
+│             Manual Commit
 │
-▼
-Manual Offset Commit
+└───────────────► Failure
+                     │
+                  Retry
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+     Retry Success        Retry Exhausted
+          │                     │
+          ▼                     ▼
+    Manual Commit         orders-dlt
 
 
 ## Current Features
@@ -77,3 +90,8 @@ Manual Offset Commit
 - Manual Offset Commit
 - Retry on failure
 - At-Least-Once processing
+- Retry with DefaultErrorHandler
+- FixedBackOff Retry Strategy
+- Dead Letter Topic (DLT)
+- DeadLetterPublishingRecoverer
+- Consumer Lag Analysis
