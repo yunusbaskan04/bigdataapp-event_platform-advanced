@@ -30,7 +30,7 @@ event_platform/
 - [x] Sprint 04 - Spring Boot Consumer
 - [x] Sprint 05 - PostgreSQL
 - [x] Sprint 06 - Reliable Consumer Processing
-- [ ] Sprint 07 - Idempotency, Transactions & Outbox Pattern
+- [x] Sprint 07 - Idempotency, Transactions & Outbox Pattern
 - [ ] Sprint 08 - Kafka Connect
 - [ ] Sprint 09 - Debezium CDC
 - [ ] Sprint 10 - Kafka Streams
