@@ -31,73 +31,60 @@ event_platform/
 - [x] Sprint 05 - PostgreSQL
 - [x] Sprint 06 - Reliable Consumer Processing
 - [x] Sprint 07 - Idempotency, Transactions & Outbox Pattern
-- [ ] Sprint 08 - Kafka Connect
-- [ ] Sprint 09 - Debezium CDC
+- [x] Sprint 08 - Kafka Connect & Debezium CDC
+- [ ] Sprint 09 - Debezium Event Router (Outbox SMT)
 - [ ] Sprint 10 - Kafka Streams
 - [ ] Sprint 11 - Monitoring
 - [ ] Sprint 12 - Production Improvements
 
 ## Current Architecture
 
-Client
-│
-HTTP
-│
-▼
-Producer Service
-│
-KafkaTemplate
-│
-▼
-Kafka Topic (orders)
-│
-▼
-Consumer Service
-│
-▼
-Business Logic
-│
-├───────────────► Success
-│                    │
-│                    ▼
-│             PostgreSQL
-│                    │
-│                    ▼
-│             Manual Commit
-│
-└───────────────► Failure
-                     │
-                  Retry
-                     │
-          ┌──────────┴──────────┐
-          │                     │
-     Retry Success        Retry Exhausted
-          │                     │
-          ▼                     ▼
-    Manual Commit         orders-dlt
+                HTTP
+                  │
+                  ▼
+         Producer Service
+                  │
+        Database Transaction
+                  │
+        ┌─────────┴─────────┐
+        ▼                   ▼
+     Orders           Outbox Events
+        │                   │
+        └─────────┬─────────┘
+                  ▼
+          PostgreSQL WAL
+                  │
+                  ▼
+             Debezium CDC
+                  │
+                  ▼
+           Kafka Connect
+                  │
+                  ▼
+ Kafka Topic (event-platform.public.outbox_events)
+                  │
+                  ▼
+          Consumer Service
 
 
 ## Current Features
 
 ## Current Features
 
-- Produce events using Spring Kafka
-- Consume events with KafkaListener
-- Consumer Groups
-- ConsumerRecord metadata
-- JSON deserialization using Jackson
-- Persist events into PostgreSQL
+- Spring Boot Producer Service
+- Spring Boot Consumer Service
+- Apache Kafka Producer & Consumer
+- PostgreSQL Integration
+- Spring Data JPA
 - Manual Offset Commit
-- Retry on failure
-- At-Least-Once processing
-- Retry with DefaultErrorHandler
-- FixedBackOff Retry Strategy
+- Retry Strategy
 - Dead Letter Topic (DLT)
-- DeadLetterPublishingRecoverer
+- At-Least-Once Delivery
 - Consumer Lag Analysis
-- Idempotent Consumer (Concept)
-- Idempotent Producer (Concept)
-- Kafka Transactions (Theory)
-- Transactional Outbox Pattern (Theory)
+- Transactional Outbox Pattern
+- Kafka Connect
+- Debezium CDC
+- PostgreSQL Logical Replication
+- WAL (Write Ahead Log)
 - Change Data Capture (CDC)
-- PostgreSQL WAL
+- Automatic Event Publishing

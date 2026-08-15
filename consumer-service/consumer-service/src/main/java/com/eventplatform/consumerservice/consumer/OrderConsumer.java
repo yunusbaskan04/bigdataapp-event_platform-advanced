@@ -30,14 +30,8 @@ public class OrderConsumer {
                     record.value(),
                     Order.class
             );
-            System.out.println("Consumer invoked");
-
 
             orderService.save(order);
-
-            if (true) {
-                throw new RuntimeException("Test Exception");
-            }
 
             acknowledgment.acknowledge();
 
