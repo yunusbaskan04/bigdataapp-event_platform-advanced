@@ -35,6 +35,9 @@ public class OrderService {
             String payload = objectMapper.writeValueAsString(order);
 
             OutboxEvent event = new OutboxEvent();
+
+            event.setAggregateType("orders");
+            event.setAggregateId(String.valueOf(order.getOrderId()));
             event.setEventType("ORDER_CREATED");
             event.setPayload(payload);
 

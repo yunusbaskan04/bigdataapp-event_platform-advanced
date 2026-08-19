@@ -12,18 +12,35 @@ public class OutboxEvent {
     @Id
     private UUID id;
 
+    @Column(name = "aggregate_type")
+    private String aggregateType;
+
+    @Column(name = "aggregate_id")
+    private String aggregateId;
+
+    @Column(name = "event_type")
     private String eventType;
 
     @Column(columnDefinition = "jsonb")
     private String payload;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     public OutboxEvent() {
     }
 
-    public OutboxEvent(UUID id, String eventType, String payload, LocalDateTime createdAt) {
+    public OutboxEvent(
+            UUID id,
+            String aggregateType,
+            String aggregateId,
+            String eventType,
+            String payload,
+            LocalDateTime createdAt
+    ) {
         this.id = id;
+        this.aggregateType = aggregateType;
+        this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
         this.createdAt = createdAt;
@@ -40,13 +57,29 @@ public class OutboxEvent {
             createdAt = LocalDateTime.now();
         }
     }
-    // Getter & Setter
-    public String getPayload() {
-        return payload;
+
+    public UUID getId() {
+        return id;
     }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getAggregateType() {
+        return aggregateType;
+    }
+
+    public void setAggregateType(String aggregateType) {
+        this.aggregateType = aggregateType;
+    }
+
+    public String getAggregateId() {
+        return aggregateId;
+    }
+
+    public void setAggregateId(String aggregateId) {
+        this.aggregateId = aggregateId;
     }
 
     public String getEventType() {
@@ -57,12 +90,12 @@ public class OutboxEvent {
         this.eventType = eventType;
     }
 
-    public UUID getId() {
-        return id;
+    public String getPayload() {
+        return payload;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setPayload(String payload) {
+        this.payload = payload;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -72,6 +105,4 @@ public class OutboxEvent {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-
 }
