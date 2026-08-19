@@ -365,14 +365,16 @@ This is the architecture commonly used in production microservice systems becaus
 
 Next Sprint
 
-Implement Kafka Consumers.
+Next we will explore Kafka Streams and learn how to process events directly inside Kafka.
 
 Goals:
 
-Consume business events from Kafka
-Configure Consumer Groups
-JSON Deserialization
-Error Handling & Dead Letter Topic (DLT)
-Retry Mechanisms
-Multiple Consumer Services
-End-to-End Event-Driven Communications
+- Kafka Streams Architecture
+- KStream
+- KTable
+- Stateless Operations
+- Stateful Operations
+- Filtering & Mapping
+- Aggregations
+- Windowing
+- Stream Topologies

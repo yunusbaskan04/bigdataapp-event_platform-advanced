@@ -34,11 +34,10 @@ event_platform/
 - [x] Sprint 07 - Idempotency, Transactions & Outbox Pattern
 - [x] Sprint 08 - Kafka Connect & Debezium CDC
 - [x] Sprint 09 - Debezium Event Router (Outbox SMT)
-- [ ] Sprint 10 - Advanced Kafka Consumers
-- [ ] Sprint 11 - Multi-Consumer Architecture
-- [ ] Sprint 12 - Kafka Streams
-- [ ] Sprint 13 - Monitoring & Observability
-- [ ] Sprint 14 - Production Improvements
+- [ ] Sprint 10 - Kafka Streams
+- [ ] Sprint 11 - Monitoring & Observability
+- [ ] Sprint 12 - Production Improvements
+- [ ] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
 ## Current Architecture
 
     HTTP
