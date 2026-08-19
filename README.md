@@ -46,16 +46,16 @@ event_platform/
 ```mermaid
 flowchart TD
     Client[Client HTTP] --> Producer[Producer Service]
-    Producer -->|@Transactional| DB[(PostgreSQL Database)]
-    DB -->|PostgreSQL WAL| Debezium[Debezium CDC Connector]
-    Debezium -->|Outbox SMT| OrdersTopic[Kafka Topic: orders]
+    Producer -->|"@Transactional"| DB[(PostgreSQL Database)]
+    DB -->|"PostgreSQL WAL"| Debezium[Debezium CDC Connector]
+    Debezium -->|"Outbox SMT"| OrdersTopic["Kafka Topic: orders"]
     
     OrdersTopic --> Consumer[Consumer Service]
     Consumer --> ConsumerDB[(Consumer Database)]
 
-    OrdersTopic --> Stream[Stream Service / Kafka Streams]
-    Stream -->|Stateless Map & Enrich| ProcessedTopic[Kafka Topic: processed-orders]
-    Stream -->|Stateful GroupBy & RocksDB| CountsTopic[Kafka Topic: product-counts]
+    OrdersTopic --> Stream["Stream Service / Kafka Streams"]
+    Stream -->|"Stateless Map & Enrich"| ProcessedTopic["Kafka Topic: processed-orders"]
+    Stream -->|"Stateful GroupBy & RocksDB"| CountsTopic["Kafka Topic: product-counts"]
 ```
 
 ### Text Topology View
