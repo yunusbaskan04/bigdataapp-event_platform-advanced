@@ -15,6 +15,7 @@ A production-oriented Event-Driven E-Commerce platform built to learn Apache Kaf
 
 ## Project Structure
 
+```text
 event_platform/
 ├── producer-service/
 ├── consumer-service/
@@ -22,6 +23,7 @@ event_platform/
 ├── stream-service/
 ├── docs/
 └── docker-compose.yml
+```
 
 ## Current Progress
 
@@ -34,37 +36,63 @@ event_platform/
 - [x] Sprint 07 - Idempotency, Transactions & Outbox Pattern
 - [x] Sprint 08 - Kafka Connect & Debezium CDC
 - [x] Sprint 09 - Debezium Event Router (Outbox SMT)
-- [ ] Sprint 10 - Kafka Streams
+- [x] Sprint 10 - Kafka Streams
 - [ ] Sprint 11 - Monitoring & Observability
 - [ ] Sprint 12 - Production Improvements
 - [ ] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
+
 ## Current Architecture
 
-    HTTP
- │
- ▼
-Producer Service
- │
-@Transactional
- │
-├──────────────┐
-▼              ▼
-Orders     Outbox Events
-                │
-                ▼
-        PostgreSQL WAL
-                │
-                ▼
-        Debezium Connector
-                │
-                ▼
-        Event Router SMT
-                │
-                ▼
-        Kafka Topic (orders)
-                │
-                ▼
-        Consumer Service
+```mermaid
+flowchart TD
+    Client[Client HTTP] --> Producer[Producer Service]
+    Producer -->|@Transactional| DB[(PostgreSQL Database)]
+    DB -->|PostgreSQL WAL| Debezium[Debezium CDC Connector]
+    Debezium -->|Outbox SMT| OrdersTopic[Kafka Topic: orders]
+    
+    OrdersTopic --> Consumer[Consumer Service]
+    Consumer --> ConsumerDB[(Consumer Database)]
+
+    OrdersTopic --> Stream[Stream Service / Kafka Streams]
+    Stream -->|Stateless Map & Enrich| ProcessedTopic[Kafka Topic: processed-orders]
+    Stream -->|Stateful GroupBy & RocksDB| CountsTopic[Kafka Topic: product-counts]
+```
+
+### Text Topology View
+
+```text
+               Client (HTTP)
+                     │
+                     ▼
+              Producer Service
+                     │
+               @Transactional
+                     │
+        ┌────────────┴────────────┐
+        ▼                         ▼
+   Orders Table             Outbox Table
+                                  │
+                                  ▼
+                            PostgreSQL WAL
+                                  │
+                                  ▼
+                         Debezium Connector
+                                  │
+                                  ▼
+                          Event Router SMT
+                                  │
+                                  ▼
+                         Kafka Topic (orders)
+                                  │
+         ┌────────────────────────┴────────────────────────┐
+         ▼                                                 ▼
+  Consumer Service                                  Stream Service (KStream)
+         │                                                 │
+         ▼                                ┌────────────────┴────────────────┐
+   PostgreSQL DB                          ▼                                 ▼
+                             Topic: processed-orders             Topic: product-counts
+                             (Event Enrichment)                  (RocksDB Stateful Aggregation)
+```
 
 ## Current Features
 
@@ -90,3 +118,8 @@ Orders     Outbox Events
 - Aggregate-based Topic Routing
 - Outbox Payload Transformation
 - Automatic Topic Routing
+- Kafka Streams (`@EnableKafkaStreams`)
+- Real-Time Event Filtering & Enrichment
+- Stateful Stream Aggregation (RocksDB State Store)
+- Dynamic Re-keying & Topic Repartitioning
+- KStream & KTable Dual Abstractions
