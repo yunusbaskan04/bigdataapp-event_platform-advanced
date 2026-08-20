@@ -31,6 +31,10 @@ public class OrderConsumer {
                     Order.class
             );
 
+            if (order.getOrderId() == null) {
+                order.setOrderId(System.currentTimeMillis());
+            }
+
             orderService.save(order);
 
             acknowledgment.acknowledge();

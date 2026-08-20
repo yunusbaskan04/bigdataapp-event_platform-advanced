@@ -37,7 +37,7 @@ event_platform/
 - [x] Sprint 08 - Kafka Connect & Debezium CDC
 - [x] Sprint 09 - Debezium Event Router (Outbox SMT)
 - [x] Sprint 10 - Kafka Streams
-- [ ] Sprint 11 - Monitoring & Observability
+- [x] Sprint 11 - Monitoring & Observability
 - [ ] Sprint 12 - Production Improvements
 - [ ] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
 
@@ -56,6 +56,16 @@ flowchart TD
     OrdersTopic --> Stream["Stream Service / Kafka Streams"]
     Stream -->|"Stateless Map & Enrich"| ProcessedTopic["Kafka Topic: processed-orders"]
     Stream -->|"Stateful GroupBy & RocksDB"| CountsTopic["Kafka Topic: product-counts"]
+
+    subgraph Observability ["Observability Stack"]
+        Prometheus[Prometheus Server]
+        Grafana[Grafana Dashboards]
+        Grafana -->|"PromQL"| Prometheus
+    end
+
+    Producer -.->|"/actuator/prometheus"| Prometheus
+    Consumer -.->|"/actuator/prometheus"| Prometheus
+    Stream -.->|"/actuator/prometheus"| Prometheus
 ```
 
 ### Text Topology View
@@ -92,6 +102,16 @@ flowchart TD
    PostgreSQL DB                          ▼                                 ▼
                              Topic: processed-orders             Topic: product-counts
                              (Event Enrichment)                  (RocksDB Stateful Aggregation)
+
+  ========================================================================================
+                                     OBSERVABILITY STACK
+    [Grafana UI: Port 3000] ──(PromQL)──> [Prometheus: Port 9090]
+                                                  │
+                ┌─────────────────────────────────┼─────────────────────────────────┐
+                │ (Scrape /actuator/prometheus)   │ (Scrape /actuator/prometheus)   │ (Scrape /actuator/prometheus)
+                ▼                                 ▼                                 ▼
+        Producer Service                  Consumer Service                  Stream Service
+  ========================================================================================
 ```
 
 ## Current Features
@@ -123,3 +143,7 @@ flowchart TD
 - Stateful Stream Aggregation (RocksDB State Store)
 - Dynamic Re-keying & Topic Repartitioning
 - KStream & KTable Dual Abstractions
+- Spring Boot Actuator (`/actuator/prometheus`)
+- Micrometer Prometheus Registry
+- Prometheus Time-Series Scraper & DB Integration
+- Grafana Metrics Visualization & Monitoring Dashboards
