@@ -38,7 +38,7 @@ event_platform/
 - [x] Sprint 09 - Debezium Event Router (Outbox SMT)
 - [x] Sprint 10 - Kafka Streams
 - [x] Sprint 11 - Monitoring & Observability
-- [ ] Sprint 12 - Production Improvements
+- [x] Sprint 12 - Production Improvements
 - [ ] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
 
 ## Current Architecture
@@ -52,6 +52,8 @@ flowchart TD
     
     OrdersTopic --> Consumer[Consumer Service]
     Consumer --> ConsumerDB[(Consumer Database)]
+    Consumer -->|"Poison Pills / Non-Retryable"| DLTTopic["Kafka Topic: orders-dlt"]
+    DLTTopic --> DLTConsumer["DltOrderConsumer (Audit Logger)"]
 
     OrdersTopic --> Stream["Stream Service / Kafka Streams"]
     Stream -->|"Stateless Map & Enrich"| ProcessedTopic["Kafka Topic: processed-orders"]
@@ -147,3 +149,8 @@ flowchart TD
 - Micrometer Prometheus Registry
 - Prometheus Time-Series Scraper & DB Integration
 - Grafana Metrics Visualization & Monitoring Dashboards
+- Producer Idempotence & Exactly-Once Semantics (`enable.idempotence=true`)
+- Classified Error Handling & Exponential BackOff Retries
+- Dead Letter Topic (DLT) Exception Header Extraction & Audit Logging
+- Consumer Concurrency (Parallel Processing Threads)
+- Graceful Shutdown & Manual Offset Commit Tuning

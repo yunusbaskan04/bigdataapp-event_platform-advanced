@@ -22,30 +22,25 @@ public class OrderConsumer {
 
     @KafkaListener(topics = "orders")
     public void consume(ConsumerRecord<String, String> record,
-                        Acknowledgment acknowledgment) {
+                        Acknowledgment acknowledgment) throws Exception {
 
-        try {
-
-            Order order = objectMapper.readValue(
-                    record.value(),
-                    Order.class
-            );
-
-            if (order.getOrderId() == null) {
-                order.setOrderId(System.currentTimeMillis());
-            }
-
-            orderService.save(order);
-
-            acknowledgment.acknowledge();
-
-            System.out.println("Order saved successfully.");
-
-        } catch (Exception e) {
-
-            System.out.println("Error : " + e.getMessage());
-
-            throw new RuntimeException(e);
+        if (record.value() == null || record.value().isBlank()) {
+            throw new IllegalArgumentException("Received empty/blank record payload");
         }
+
+        Order order = objectMapper.readValue(
+                record.value(),
+                Order.class
+        );
+
+        if (order.getOrderId() == null) {
+            order.setOrderId(System.currentTimeMillis());
+        }
+
+        orderService.save(order);
+
+        acknowledgment.acknowledge();
+
+        System.out.println("Order saved successfully.");
     }
 }

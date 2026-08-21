@@ -4,6 +4,12 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:19092
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+        retries: 2147483647
+        max.in.flight.requests.per.connection: 5
 
   datasource:
     url: jdbc:postgresql://localhost:5433/event_platform
