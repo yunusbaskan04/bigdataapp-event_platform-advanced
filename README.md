@@ -96,14 +96,16 @@ flowchart TD
                                   ▼
                          Kafka Topic (orders)
                                   │
-         ┌────────────────────────┴────────────────────────┐
-         ▼                                                 ▼
-  Consumer Service                                  Stream Service (KStream)
-         │                                                 │
-         ▼                                ┌────────────────┴────────────────┐
-   PostgreSQL DB                          ▼                                 ▼
-                             Topic: processed-orders             Topic: product-counts
-                             (Event Enrichment)                  (RocksDB Stateful Aggregation)
+          ┌────────────────────────┴────────────────────────┐
+          ▼                                                 ▼
+   Consumer Service                                  Stream Service (KStream)
+          │                                                 │
+   ┌──────┴──────────────┐                         ┌────────┴────────────────┐
+   ▼                     ▼                         ▼                         ▼
+PostgreSQL DB     orders-dlt Topic        Topic: processed-orders   Topic: product-counts
+                         │                (Event Enrichment)        (RocksDB Stateful Aggregation)
+                         ▼
+                DltOrderConsumer (Audit)
 
   ========================================================================================
                                      OBSERVABILITY STACK
