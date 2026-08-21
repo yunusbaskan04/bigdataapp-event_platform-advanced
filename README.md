@@ -39,7 +39,7 @@ event_platform/
 - [x] Sprint 10 - Kafka Streams
 - [x] Sprint 11 - Monitoring & Observability
 - [x] Sprint 12 - Production Improvements
-- [ ] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
+- [x] Sprint 13 - Event-Driven Microservices (Multi Consumer Architecture)
 
 ## Current Architecture
 
@@ -50,9 +50,15 @@ flowchart TD
     DB -->|"PostgreSQL WAL"| Debezium[Debezium CDC Connector]
     Debezium -->|"Outbox SMT"| OrdersTopic["Kafka Topic: orders"]
     
-    OrdersTopic --> Consumer[Consumer Service]
-    Consumer --> ConsumerDB[(Consumer Database)]
-    Consumer -->|"Poison Pills / Non-Retryable"| DLTTopic["Kafka Topic: orders-dlt"]
+    subgraph FanOutConsumers ["Fan-Out Multi-Consumer Architecture"]
+        OrdersTopic --> NotificationConsumer["NotificationConsumer\n(notification-group)"]
+        OrdersTopic --> InventoryConsumer["InventoryConsumer\n(inventory-group)"]
+        OrdersTopic --> AnalyticsConsumer["AnalyticsConsumer\n(analytics-group)"]
+    end
+
+    NotificationConsumer -->|"Poison Pills"| DLTTopic["Kafka Topic: orders-dlt"]
+    InventoryConsumer -->|"Poison Pills"| DLTTopic
+    AnalyticsConsumer -->|"Poison Pills"| DLTTopic
     DLTTopic --> DLTConsumer["DltOrderConsumer (Audit Logger)"]
 
     OrdersTopic --> Stream["Stream Service / Kafka Streams"]
@@ -66,7 +72,7 @@ flowchart TD
     end
 
     Producer -.->|"/actuator/prometheus"| Prometheus
-    Consumer -.->|"/actuator/prometheus"| Prometheus
+    FanOutConsumers -.->|"/actuator/prometheus"| Prometheus
     Stream -.->|"/actuator/prometheus"| Prometheus
 ```
 
@@ -96,16 +102,17 @@ flowchart TD
                                   ▼
                          Kafka Topic (orders)
                                   │
-          ┌────────────────────────┴────────────────────────┐
-          ▼                                                 ▼
-   Consumer Service                                  Stream Service (KStream)
-          │                                                 │
-   ┌──────┴──────────────┐                         ┌────────┴────────────────┐
-   ▼                     ▼                         ▼                         ▼
-PostgreSQL DB     orders-dlt Topic        Topic: processed-orders   Topic: product-counts
-                         │                (Event Enrichment)        (RocksDB Stateful Aggregation)
-                         ▼
-                DltOrderConsumer (Audit)
+     ┌────────────────────────────┼────────────────────────────┬────────────────────────────┐
+     ▼                            ▼                            ▼                            ▼
+NotificationConsumer       InventoryConsumer            AnalyticsConsumer            Stream Service (KStream)
+(notification-group)       (inventory-group)            (analytics-group)                   │
+     │                            │                            │             ┌──────────────┴──────────────┐
+     └────────────────────────────┼────────────────────────────┘             ▼                             ▼
+                                  ▼                                Topic: processed-orders       Topic: product-counts
+                          orders-dlt Topic                         (Event Enrichment)            (RocksDB Stateful Aggregation)
+                                  │
+                                  ▼
+                         DltOrderConsumer (Audit)
 
   ========================================================================================
                                      OBSERVABILITY STACK
@@ -156,3 +163,6 @@ PostgreSQL DB     orders-dlt Topic        Topic: processed-orders   Topic: produ
 - Dead Letter Topic (DLT) Exception Header Extraction & Audit Logging
 - Consumer Concurrency (Parallel Processing Threads)
 - Graceful Shutdown & Manual Offset Commit Tuning
+- Event-Driven Microservices & Fan-Out Architecture (Publish-Subscribe Pattern)
+- Multi-Consumer Group Isolation (`notification-group`, `inventory-group`, `analytics-group`)
+- Centralized Error Handling & Automatic DLT Inheritance Across Consumers
